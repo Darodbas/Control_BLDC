@@ -14,11 +14,15 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,16 +35,22 @@ import java.util.UUID;
 public class MainActivity extends AppCompatActivity {
 
 
+
     protected int REQUEST_ENABLE_BT = 1;
     protected int numDisp = 0;
+    protected int resolucion = 100000;
+
+    protected double dutyCycle;
 
     protected String dispositivosEmp = "";
     protected String macMicro = "";
     protected String nombreMicro = "DAVID-PC";
+    protected String cadenaRecibida = "";
 
-    protected Button  btConectar,btEnvio,btRecibe;
+    protected Button  btConectar,btEnvio,btRecibe,btEnvioValor;
     public TextView tvRecibo;
-    protected EditText etEnvio;
+    protected EditText etEnvio,etValorEnvio;
+    protected SeekBar sbBarraDeslizante;
 
     protected boolean conectado=false;
 
@@ -61,12 +71,6 @@ public class MainActivity extends AppCompatActivity {
     InputStream entradas;
 
 
-    public void leerEntradas(){
-
-
-
-
-    }
 
     public void MensajesPantalla(int codigo){
 
@@ -155,6 +159,9 @@ public class MainActivity extends AppCompatActivity {
         btEnvio = findViewById(R.id.btEnviar);
         tvRecibo = findViewById(R.id.tvRecibe);
         btRecibe = findViewById(R.id.btRecibir);
+        sbBarraDeslizante = findViewById(R.id.sbBarraDeslizante);
+        etValorEnvio = findViewById(R.id.etValorEnvio);
+        btEnvioValor = findViewById(R.id.btEnvioValor);
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -168,6 +175,8 @@ public class MainActivity extends AppCompatActivity {
             //No soporta BLE
             MensajesPantalla(3);
         }
+
+
 
         btConectar.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("MissingPermission")
@@ -279,18 +288,28 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        btRecibe.setOnClickListener(new View.OnClickListener() {
+        btRecibe.setOnClickListener(new View.OnClickListener() { //espera a recibir datos, solo finaliza si recibe 'f'//
             @Override
             public void onClick(View view) {
 
+
+
                 if (conectado) {
-                    String cadenaRecibida = "";
+                    char caracter=' ';
+                    cadenaRecibida="";
+
                     try {
 
                         entradas.skip(entradas.available());
-                        for (int i = 0; i < 4; i++) {
 
-                            cadenaRecibida = cadenaRecibida +(char)entradas.read();
+
+
+                       while(caracter!='f'){
+
+                           caracter =(char) entradas.read();
+                           if(caracter!='f'){
+                               cadenaRecibida = cadenaRecibida + caracter;
+                           }
 
 
                         }
@@ -299,11 +318,71 @@ public class MainActivity extends AppCompatActivity {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+
                 }else{
                     MensajesPantalla(0);
                 }
             }
         });
+
+        btEnvioValor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (conectado) {
+                    if (etValorEnvio.getText().length() > 0) {
+
+                        dutyCycle = Double.parseDouble(String.valueOf(etValorEnvio.getText()));
+
+                        if (dutyCycle >= 0 && dutyCycle <= 1) {
+
+                            sbBarraDeslizante.setProgress((int)(dutyCycle*resolucion));
+
+                            String textoEnvio;
+                            int caracter;
+                            textoEnvio = "D"+ String.valueOf(etValorEnvio.getText())+"d";
+
+
+                            try {
+
+                                for (caracter = 0; caracter < textoEnvio.length(); caracter++) {
+                                    salidas.write(textoEnvio.charAt(caracter));
+                                }
+
+
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+
+                        }
+                    }
+                }else{
+                    MensajesPantalla(0);
+                }
+            }
+        });
+
+        sbBarraDeslizante.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                dutyCycle = (double) i/resolucion;
+                etValorEnvio.setText(Double.toString(dutyCycle));
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                etValorEnvio.setText(Double.toString(dutyCycle));
+
+            }
+        });
+
+
 
 
     }
