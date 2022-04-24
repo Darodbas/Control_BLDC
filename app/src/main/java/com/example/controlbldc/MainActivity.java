@@ -40,11 +40,13 @@ public class MainActivity extends AppCompatActivity {
     protected int numDisp = 0;
     protected int resolucion = 100000;
 
+    protected boolean valorEdittext=false;
+
     protected double dutyCycle;
 
     protected String dispositivosEmp = "";
     protected String macMicro = "";
-    protected String nombreMicro = "DAVID-PC";
+    protected String nombreMicro = "ESP32Drive"; //"DAVID-PC";
     protected String cadenaRecibida = "";
 
     protected Button  btConectar,btEnvio,btRecibe,btEnvioValor;
@@ -115,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (pairedDevices.size() > 0) {
             // Hay dispositivos emparejados
+            tvRecibo.setText("hay emparejados");
             macMicro = "";
             for (BluetoothDevice device : pairedDevices) {
                 String deviceName = device.getName();
@@ -129,7 +132,9 @@ public class MainActivity extends AppCompatActivity {
                 dispositivosEmp = dispositivosEmp + "\r\n" + deviceName;
                 numDisp++;
 
+
             }
+
         }
     }
 
@@ -196,7 +201,9 @@ public class MainActivity extends AppCompatActivity {
                 if(btactiv) {
                     if (!conectado) {
                         //Luego busca el micro en los emparejados//
+
                         PairedDisp();
+                        tvRecibo.setText("paired");
 
                         //intenta conectarse//
                         if (macMicro.length() > 0) {
@@ -219,15 +226,24 @@ public class MainActivity extends AppCompatActivity {
                                 contador++;
                             } while (!btsocket.isConnected() && contador <= 10);
 
-                            if (btsocket.isConnected()) {
+                            if (btsocket.isConnected()) { //conectado correctamente//
                                 conectado = true;
 
                                 btConectar.setBackgroundColor(Color.GREEN);
                                 btConectar.setText("Desconectar");
                                 btConectar.setTextColor(Color.BLACK);
-                            } else {
+
+                            } else { //error al conectar//
+
+                                try {
+                                    btsocket.close();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
                                 MensajesPantalla(4);
                                 conectado = false;
+
                             }
 
                             try {
@@ -328,6 +344,7 @@ public class MainActivity extends AppCompatActivity {
         btEnvioValor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 if (conectado) {
                     if (etValorEnvio.getText().length() > 0) {
 
@@ -335,11 +352,12 @@ public class MainActivity extends AppCompatActivity {
 
                         if (dutyCycle >= 0 && dutyCycle <= 1) {
 
+                            valorEdittext=true;
                             sbBarraDeslizante.setProgress((int)(dutyCycle*resolucion));
 
                             String textoEnvio;
                             int caracter;
-                            textoEnvio = "D"+ String.valueOf(etValorEnvio.getText())+"d";
+                            textoEnvio = "D"+ etValorEnvio.getText()+"d";
 
 
                             try {
@@ -357,6 +375,13 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }else{
+                    valorEdittext=true;
+                    dutyCycle = Double.parseDouble(String.valueOf(etValorEnvio.getText()));
+
+                    if (dutyCycle >= 0 && dutyCycle <= 1) {
+
+                        sbBarraDeslizante.setProgress((int) (dutyCycle * resolucion));
+                    }
                     MensajesPantalla(0);
                 }
             }
@@ -365,13 +390,18 @@ public class MainActivity extends AppCompatActivity {
         sbBarraDeslizante.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                dutyCycle = (double) i/resolucion;
-                etValorEnvio.setText(Double.toString(dutyCycle));
+
+                if(valorEdittext==false){//si el valor lo cambia el edit text no hace nada
+                    dutyCycle = (double) i/resolucion;
+                    etValorEnvio.setText(Double.toString(dutyCycle));
+                }
+
 
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
+                valorEdittext=false;
 
             }
 
