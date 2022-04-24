@@ -12,11 +12,15 @@
 
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
 
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/iconoblcdapp"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/iconoblcdapp"
         android:supportsRtl="true"
         android:theme="@style/Theme.ControlBLDC">
         <activity

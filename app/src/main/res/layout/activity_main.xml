@@ -36,7 +36,7 @@
         android:id="@+id/btEnviar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="#3D5AFE"
+        android:backgroundTint="#000000"
         android:text="Enviar"
         app:layout_constraintBottom_toTopOf="@+id/guideline3"
         app:layout_constraintEnd_toStartOf="@+id/guideline8"
@@ -63,7 +63,7 @@
         android:id="@+id/btRecibir"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="#3D5AFE"
+        android:backgroundTint="#000000"
         android:text="Recibir"
         app:layout_constraintBottom_toTopOf="@+id/guideline6"
         app:layout_constraintEnd_toStartOf="@+id/guideline5"
@@ -147,9 +147,9 @@
         android:layout_width="302dp"
         android:layout_height="61dp"
         android:longClickable="true"
-        android:max="100000"
+        android:max="10000"
         android:min="0"
-        android:progress="50000"
+        android:progress="5000"
         android:progressTint="#79AEAE"
         app:layout_constraintBottom_toTopOf="@+id/guideline14"
         app:layout_constraintEnd_toEndOf="parent"
@@ -192,14 +192,15 @@
 
     <Button
         android:id="@+id/btEnvioValor"
-        android:layout_width="108dp"
-        android:layout_height="54dp"
+        android:layout_width="103dp"
+        android:layout_height="57dp"
+        android:backgroundTint="#07AC00"
         android:text="Duty Cycle"
         app:layout_constraintBottom_toTopOf="@+id/guideline12"
         app:layout_constraintEnd_toStartOf="@+id/guideline8"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="@+id/guideline4"
         app:layout_constraintTop_toTopOf="@+id/guideline11"
-        app:layout_constraintVertical_bias="0.241" />
+        app:layout_constraintVertical_bias="0.625" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

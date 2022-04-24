@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
     protected int REQUEST_ENABLE_BT = 1;
     protected int numDisp = 0;
-    protected int resolucion = 100000;
+    protected int resolucion = 10000;
 
     protected boolean valorEdittext=false;
 
@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
     protected String dispositivosEmp = "";
     protected String macMicro = "";
-    protected String nombreMicro = "DAVID-PC";
+    protected String nombreMicro = "MSI-DAVID";//"DAVID-PC";
     protected String cadenaRecibida = "";
 
     protected Button  btConectar,btEnvio,btRecibe,btEnvioValor;
@@ -117,7 +117,6 @@ public class MainActivity extends AppCompatActivity {
 
         if (pairedDevices.size() > 0) {
             // Hay dispositivos emparejados
-            tvRecibo.setText("hay emparejados");
             macMicro = "";
             for (BluetoothDevice device : pairedDevices) {
                 String deviceName = device.getName();
@@ -175,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
         //Comprobaciuones iniciales//
         if (bluetoothAdapter == null) {
             // No soporta bluetooth
-           MensajesPantalla(3);
+            MensajesPantalla(3);
         }
 
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
@@ -186,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
 
         btConectar.setOnClickListener(new View.OnClickListener() {
 
-            //@SuppressLint("MissingPermission")
+            @SuppressLint("MissingPermission")
             @Override
             public void onClick(View view) {
 
@@ -202,78 +201,56 @@ public class MainActivity extends AppCompatActivity {
 
                 }
 
-               /* if(btactiv) {
+                if(btactiv) {
                     if (!conectado) {
                         //Luego busca el micro en los emparejados//
-
                         PairedDisp();
-                        tvRecibo.setText("paired");
-
                         //intenta conectarse//
                         if (macMicro.length() > 0) {
-
                             int contador = 0;
-
                             do {
-
-
                                 try {
                                     btsocket = microControlador.createRfcommSocketToServiceRecord(mUUID);
-
                                     btsocket.connect();
-
-
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
                                 contador++;
                             } while (!btsocket.isConnected() && contador <= 10);
-
                             if (btsocket.isConnected()) { //conectado correctamente//
                                 conectado = true;
-
                                 btConectar.setBackgroundColor(Color.GREEN);
                                 btConectar.setText("Desconectar");
                                 btConectar.setTextColor(Color.BLACK);
-
                             } else { //error al conectar//
-
                                 try {
                                     btsocket.close();
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
-
                                 MensajesPantalla(4);
                                 conectado = false;
-
                             }
-
                             try {
                                 salidas = btsocket.getOutputStream();
                                 entradas = btsocket.getInputStream();
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
-
-
                         } else {
-
                         }
                     }else{
                         try {
                             btsocket.close();
                             conectado=false;
-
                             btConectar.setBackgroundColor(Color.BLUE);
                             btConectar.setText("Conectar");
                             btConectar.setTextColor(Color.WHITE);
-
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
-                }*/
+                }
             }
         });
 
@@ -323,12 +300,12 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-                       while(caracter!='f'){
+                        while(caracter!='f'){
 
-                           caracter =(char) entradas.read();
-                           if(caracter!='f'){
-                               cadenaRecibida = cadenaRecibida + caracter;
-                           }
+                            caracter =(char) entradas.read();
+                            if(caracter!='f'){
+                                cadenaRecibida = cadenaRecibida + caracter;
+                            }
 
 
                         }
@@ -398,8 +375,6 @@ public class MainActivity extends AppCompatActivity {
                     dutyCycle = (double) i/resolucion;
                     etValorEnvio.setText(Double.toString(dutyCycle));
                 }
-
-
             }
 
             @Override
@@ -420,4 +395,3 @@ public class MainActivity extends AppCompatActivity {
 
     }
 }
-
