@@ -36,7 +36,7 @@
         android:id="@+id/btEnviar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="#000000"
+        android:backgroundTint="#3D5AFE"
         android:text="Enviar"
         app:layout_constraintBottom_toTopOf="@+id/guideline3"
         app:layout_constraintEnd_toStartOf="@+id/guideline8"
@@ -63,7 +63,7 @@
         android:id="@+id/btRecibir"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="#000000"
+        android:backgroundTint="#3D5AFE"
         android:text="Recibir"
         app:layout_constraintBottom_toTopOf="@+id/guideline6"
         app:layout_constraintEnd_toStartOf="@+id/guideline5"
@@ -144,8 +144,8 @@
 
     <SeekBar
         android:id="@+id/sbBarraDeslizante"
-        android:layout_width="293dp"
-        android:layout_height="41dp"
+        android:layout_width="302dp"
+        android:layout_height="61dp"
         android:longClickable="true"
         android:max="100000"
         android:min="0"
@@ -171,7 +171,7 @@
         android:gravity="center"
         android:inputType="numberDecimal"
         android:text="0.5"
-        app:layout_constraintBottom_toTopOf="@+id/guideline12"
+        app:layout_constraintBottom_toTopOf="@+id/sbBarraDeslizante"
         app:layout_constraintEnd_toStartOf="@+id/guideline4"
         app:layout_constraintStart_toStartOf="@+id/guideline7"
         app:layout_constraintTop_toTopOf="@+id/guideline11" />
@@ -188,19 +188,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.55403554" />
+        app:layout_constraintGuide_percent="0.6" />
 
     <Button
         android:id="@+id/btEnvioValor"
-        android:layout_width="102dp"
-        android:layout_height="59dp"
-        android:backgroundTint="#008E1F"
+        android:layout_width="108dp"
+        android:layout_height="54dp"
         android:text="Duty Cycle"
         app:layout_constraintBottom_toTopOf="@+id/guideline12"
         app:layout_constraintEnd_toStartOf="@+id/guideline8"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="@+id/guideline4"
         app:layout_constraintTop_toTopOf="@+id/guideline11"
-        app:layout_constraintVertical_bias="0.413" />
+        app:layout_constraintVertical_bias="0.241" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
     protected String dispositivosEmp = "";
     protected String macMicro = "";
-    protected String nombreMicro = "ESP32Drive"; //"DAVID-PC";
+    protected String nombreMicro = "DAVID-PC";
     protected String cadenaRecibida = "";
 
     protected Button  btConectar,btEnvio,btRecibe,btEnvioValor;
@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     protected Set<BluetoothDevice> pairedDevices;
     protected BluetoothDevice microControlador;
 
-    public BluetoothAdapter bluetoothAdapter = null;
+    protected BluetoothAdapter bluetoothAdapter;
 
     protected BluetoothSocket btsocket = null;
 
@@ -146,8 +146,10 @@ public class MainActivity extends AppCompatActivity {
             case 1:
                 if (resultCode == RESULT_OK) {
                     //bluetooth permitido
+
                 } else if (resultCode == RESULT_CANCELED) {
                     //bluetooth no permitido
+
                 }
 
         }
@@ -179,26 +181,28 @@ public class MainActivity extends AppCompatActivity {
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             //No soporta BLE
             MensajesPantalla(3);
+
         }
 
-
-
         btConectar.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("MissingPermission")
+
+            //@SuppressLint("MissingPermission")
             @Override
             public void onClick(View view) {
+
                 boolean btactiv;
                 //Comprueba que Bt este activado y pide permiso en caso de no estarlo//
-                if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
+                if (!bluetoothAdapter.isEnabled()) {
                     enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                     startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
                     btactiv=false;
                 } else {
 
                     btactiv=true;
+
                 }
 
-                if(btactiv) {
+               /* if(btactiv) {
                     if (!conectado) {
                         //Luego busca el micro en los emparejados//
 
@@ -214,7 +218,6 @@ public class MainActivity extends AppCompatActivity {
 
 
                                 try {
-
                                     btsocket = microControlador.createRfcommSocketToServiceRecord(mUUID);
 
                                     btsocket.connect();
@@ -270,7 +273,7 @@ public class MainActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                     }
-                }
+                }*/
             }
         });
 
