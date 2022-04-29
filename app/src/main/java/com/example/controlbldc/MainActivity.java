@@ -11,6 +11,7 @@ import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -44,16 +45,14 @@ public class MainActivity extends AppCompatActivity {
 
     protected double dutyCycle;
 
-    protected String cadenaRecibida = "";
-
     //Vectores para los dispositivos: nombres,direcciones y objetos BluetoothDevice//
     protected String[] nombresDisp;
     protected String[] direccionesDisp;
     protected BluetoothDevice[] dispositivos;
 
-    protected Button  btConectar,btEnvio,btRecibe,btEnvioValor;
+    protected Button  btConectar,btRecibe,btEnvioValor;
     public TextView tvRecibo;
-    protected EditText etEnvio,etValorEnvio;
+    protected EditText etValorEnvio;
     protected SeekBar sbBarraDeslizante;
     protected Spinner spDispositivos;
 
@@ -75,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
     OutputStream salidas;
     InputStream entradas;
 
+    SharedPreferences preferencias;
 
     public void MensajesPantalla(int codigo){
 
@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
             i=0;
-            //se llenan los vecores con los nombres y direcciones//
+            //se llenan los vectores con los nombres y direcciones//
             for (BluetoothDevice device : pairedDevices) {
 
                 nombresDisp[i] = device.getName();
@@ -145,6 +145,8 @@ public class MainActivity extends AppCompatActivity {
             //asociamos los nombres al Spinner//
             ArrayAdapter mi_adaptador = new ArrayAdapter(this, android.R.layout.simple_spinner_item, nombresDisp);
             spDispositivos.setAdapter(mi_adaptador);
+            //apuntamos al que hubieramos dejado anteriormente//
+            spDispositivos.setSelection(preferencias.getInt("DISPOSITIVO",0));
 
 
         }else{
@@ -184,8 +186,6 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().hide();
 
         btConectar = findViewById(R.id.btConectar);
-        etEnvio = findViewById(R.id.etTextoAEnviar);
-        btEnvio = findViewById(R.id.btEnviar);
         tvRecibo = findViewById(R.id.tvRecibe);
         btRecibe = findViewById(R.id.btRecibir);
         sbBarraDeslizante = findViewById(R.id.sbBarraDeslizante);
@@ -194,6 +194,8 @@ public class MainActivity extends AppCompatActivity {
         spDispositivos = findViewById(R.id.spDispositivos);
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        preferencias = getSharedPreferences("PREFERENCIAS",MODE_PRIVATE);
 
         //Comprobaciuones iniciales//
         if (bluetoothAdapter == null) {
@@ -287,35 +289,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        btEnvio.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if (conectado) {
-                    if (etEnvio.getText().length() > 0) {
-
-                        String textoEnvio;
-                        int caracter;
-                        textoEnvio = String.valueOf(etEnvio.getText());
-
-                        try {
-
-                            for (caracter = 0; caracter < textoEnvio.length(); caracter++) {
-                                salidas.write(textoEnvio.charAt(caracter));
-                            }
-
-
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }else{
-                        MensajesPantalla(1);
-                    }
-                }else {
-                    MensajesPantalla(0);
-                }
-            }
-        });
 
         btRecibe.setOnClickListener(new View.OnClickListener() { //espera a recibir datos, solo finaliza si recibe 'f'//
             @Override
@@ -330,9 +303,6 @@ public class MainActivity extends AppCompatActivity {
                 MensajesPantalla(0);
 
                 }
-
-
-
             }
         });
 
@@ -409,7 +379,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 dispConect=dispositivos[i];
-
+                SharedPreferences.Editor editor = preferencias.edit();
+                editor.putInt("DISPOSITIVO",i);
+                editor.commit();
             }
 
             @Override

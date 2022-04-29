@@ -33,7 +33,7 @@ public class ReciboDatos extends Thread{
 
                 entradas.skip(entradas.available());
 
-                while (caracter != 'D') {
+                while (caracter != 'V' && caracter!= 'I' && caracter!= 'D' ) {
 
                     caracter = (char) entradas.read();
                 }
