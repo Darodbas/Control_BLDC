@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
@@ -15,10 +14,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -38,7 +33,7 @@ import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
-
+    protected ReciboDatos recib;
 
     protected int REQUEST_ENABLE_BT = 1;
     protected int resolucion = 10000;
@@ -50,8 +45,8 @@ public class MainActivity extends AppCompatActivity {
     protected String[] direccionesDisp;
     protected BluetoothDevice[] dispositivos;
 
-    protected Button  btConectar,btRecibe,btEnvioValor;
-    public TextView tvRecibo;
+    protected Button  btConectar,btEnvioValor;
+    public TextView tvVelocidad;
     protected EditText etValorEnvio;
     protected SeekBar sbBarraDeslizante;
     protected Spinner spDispositivos;
@@ -186,8 +181,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().hide();
 
         btConectar = findViewById(R.id.btConectar);
-        tvRecibo = findViewById(R.id.tvRecibe);
-        btRecibe = findViewById(R.id.btRecibir);
+        tvVelocidad = findViewById(R.id.tvVelocidad);
         sbBarraDeslizante = findViewById(R.id.sbBarraDeslizante);
         etValorEnvio = findViewById(R.id.etValorEnvio);
         btEnvioValor = findViewById(R.id.btEnvioValor);
@@ -218,6 +212,8 @@ public class MainActivity extends AppCompatActivity {
         if(btActiv) {
             Emparejados();
         }
+
+
 
         btConectar.setOnClickListener(new View.OnClickListener() {
 
@@ -257,6 +253,10 @@ public class MainActivity extends AppCompatActivity {
                                 try {
                                     salidas = btsocket.getOutputStream();
                                     entradas = btsocket.getInputStream();
+
+                                    //empieza a recibir datos//
+                                    recib=new ReciboDatos(salidas,entradas,tvVelocidad);
+                                    recib.start();
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
@@ -281,27 +281,12 @@ public class MainActivity extends AppCompatActivity {
                             btConectar.setBackgroundColor(Color.BLUE);
                             btConectar.setText("Conectar");
                             btConectar.setTextColor(Color.WHITE);
+
+
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
-                }
-            }
-        });
-
-
-        btRecibe.setOnClickListener(new View.OnClickListener() { //espera a recibir datos, solo finaliza si recibe 'f'//
-            @Override
-            public void onClick(View view) {
-                if(conectado){
-
-                ReciboDatos recib=new ReciboDatos(salidas,entradas,tvRecibo);
-                recib.start();
-
-                }else{
-
-                MensajesPantalla(0);
-
                 }
             }
         });

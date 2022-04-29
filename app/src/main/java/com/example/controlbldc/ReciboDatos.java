@@ -10,17 +10,17 @@ public class ReciboDatos extends Thread{
 
     OutputStream salidas;
     InputStream entradas;
-    TextView tvRecibo;
+    TextView tvVelocidad;
 
-    public ReciboDatos(OutputStream salidas, InputStream entradas,TextView tvRecibo){
+    public ReciboDatos(OutputStream salidas, InputStream entradas,TextView tvVelocidad){
         this.entradas=entradas;
         this.salidas=salidas;
-        this.tvRecibo=tvRecibo;
+        this.tvVelocidad=tvVelocidad;
     }
     public ReciboDatos(){
         this.entradas=null;
         this.salidas=null;
-        this.tvRecibo=null;
+        this.tvVelocidad=null;
     }
     public void run(){
 
@@ -33,7 +33,7 @@ public class ReciboDatos extends Thread{
 
                 entradas.skip(entradas.available());
 
-                while (caracter != 'V' && caracter!= 'I' && caracter!= 'D' ) {
+                while (caracter != 'V' && caracter!= 'A' && caracter!= 'B' && caracter!= 'D' ) {
 
                     caracter = (char) entradas.read();
                 }
@@ -44,7 +44,7 @@ public class ReciboDatos extends Thread{
                     }
 
                 }
-                tvRecibo.setText(cadenaRecibida);
+                tvVelocidad.setText(cadenaRecibida);
 
             } catch (IOException e) {
                 e.printStackTrace();
