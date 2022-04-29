@@ -20,9 +20,12 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,33 +40,35 @@ public class MainActivity extends AppCompatActivity {
 
 
     protected int REQUEST_ENABLE_BT = 1;
-    protected int numDisp = 0;
     protected int resolucion = 10000;
 
-    protected boolean valorEdittext=false;
+
 
     protected double dutyCycle;
 
-    protected String dispositivosEmp = "";
-    protected String macMicro = "";
-    protected String nombreMicro = "MSI-DAVID";//"DAVID-PC";
     protected String cadenaRecibida = "";
+
+    //Vectores para los dispositivos: nombres,direcciones y objetos BluetoothDevice//
+    protected String[] nombresDisp;
+    protected String[] direccionesDisp;
+    protected BluetoothDevice[] dispositivos;
 
     protected Button  btConectar,btEnvio,btRecibe,btEnvioValor;
     public TextView tvRecibo;
     protected EditText etEnvio,etValorEnvio;
     protected SeekBar sbBarraDeslizante;
+    protected Spinner spDispositivos;
 
     protected boolean conectado=false;
-
+    protected boolean btActiv = false;
+    protected boolean valorEdittext=false;
 
     protected UUID mUUID = fromString("00001101-0000-1000-8000-00805F9B34FB");
-
 
     Intent enableBtIntent; // intent para activar bluetooth
 
     protected Set<BluetoothDevice> pairedDevices;
-    protected BluetoothDevice microControlador;
+    protected BluetoothDevice dispConect;
 
     protected BluetoothAdapter bluetoothAdapter;
 
@@ -98,6 +103,10 @@ public class MainActivity extends AppCompatActivity {
                 mensaje="Error al conectar";
                 break;
 
+            case 5:
+                mensaje="No hay dispositivos emparejados";
+                break;
+
 
         }
         mensajePant = Toast.makeText(context,mensaje,Toast.LENGTH_SHORT);
@@ -107,36 +116,48 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-
     @SuppressLint("MissingPermission")
-    public void PairedDisp() { //crea pairedDevices y el String dispositivos y comprueba si alguno es el microcontrolador//
+    public void Emparejados(){
         pairedDevices = bluetoothAdapter.getBondedDevices();
-        numDisp = 0;
-        dispositivosEmp = "";
-
         if (pairedDevices.size() > 0) {
-            // Hay dispositivos emparejados
-            macMicro = "";
-            for (BluetoothDevice device : pairedDevices) {
-                String deviceName = device.getName();
-                String deviceHardwareAddress = device.getAddress(); // MAC address
+            int i;
 
-                if (deviceName.equals(nombreMicro)) {
-                    macMicro = deviceHardwareAddress;
-                    nombreMicro = deviceName;
-                    microControlador = bluetoothAdapter.getRemoteDevice(macMicro);
-                }
+            //Se inicializan los vectores de nombres y direcciones de dispositivos//
+            for(i=0;i<pairedDevices.size();i++){
+                nombresDisp = new String[pairedDevices.size()];
+                direccionesDisp = new String[pairedDevices.size()];
+                dispositivos = new BluetoothDevice[pairedDevices.size()];
 
-                dispositivosEmp = dispositivosEmp + "\r\n" + deviceName;
-                numDisp++;
+                nombresDisp[i]="";
+                direccionesDisp[i]="";
+                dispositivos[i]=null;
 
 
             }
+            i=0;
+            //se llenan los vecores con los nombres y direcciones//
+            for (BluetoothDevice device : pairedDevices) {
 
+                nombresDisp[i] = device.getName();
+                direccionesDisp[i] = device.getAddress();
+                dispositivos[i]=bluetoothAdapter.getRemoteDevice(device.getAddress());
+
+                i++;
+
+            }
+            //asociamos los nombres al Spinner//
+            ArrayAdapter mi_adaptador = new ArrayAdapter(this, android.R.layout.simple_spinner_item, nombresDisp);
+            spDispositivos.setAdapter(mi_adaptador);
+
+
+        }else{
+            MensajesPantalla(5);
         }
     }
 
+
+
+    @SuppressLint("MissingPermission")
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -145,9 +166,15 @@ public class MainActivity extends AppCompatActivity {
             case 1:
                 if (resultCode == RESULT_OK) {
                     //bluetooth permitido
+                    btActiv=true;
+                    Emparejados();
+
+
 
                 } else if (resultCode == RESULT_CANCELED) {
                     //bluetooth no permitido
+                    btActiv=false;
+                    finish();
 
                 }
 
@@ -155,6 +182,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -168,6 +196,7 @@ public class MainActivity extends AppCompatActivity {
         sbBarraDeslizante = findViewById(R.id.sbBarraDeslizante);
         etValorEnvio = findViewById(R.id.etValorEnvio);
         btEnvioValor = findViewById(R.id.btEnvioValor);
+        spDispositivos = findViewById(R.id.spDispositivos);
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -182,6 +211,19 @@ public class MainActivity extends AppCompatActivity {
             MensajesPantalla(3);
 
         }
+        //Si bluetooth no esta activado pide activacion//
+        if (!bluetoothAdapter.isEnabled()) {
+            enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        }else{
+            btActiv=true;
+        }
+        if(btActiv) {
+            Emparejados();
+
+        }
+
+
 
         btConectar.setOnClickListener(new View.OnClickListener() {
 
@@ -189,39 +231,42 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                boolean btactiv;
                 //Comprueba que Bt este activado y pide permiso en caso de no estarlo//
                 if (!bluetoothAdapter.isEnabled()) {
                     enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                     startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-                    btactiv=false;
-                } else {
-
-                    btactiv=true;
-
                 }
 
-                if(btactiv) {
+                if(btActiv) {
                     if (!conectado) {
                         //Luego busca el micro en los emparejados//
-                        PairedDisp();
+                        //PairedDisp();
                         //intenta conectarse//
-                        if (macMicro.length() > 0) {
+                        if (true) {
                             int contador = 0;
                             do {
                                 try {
-                                    btsocket = microControlador.createRfcommSocketToServiceRecord(mUUID);
+                                    btsocket = dispConect.createRfcommSocketToServiceRecord(mUUID);
                                     btsocket.connect();
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
                                 contador++;
-                            } while (!btsocket.isConnected() && contador <= 10);
+                            } while (!btsocket.isConnected() && contador <= 3);
                             if (btsocket.isConnected()) { //conectado correctamente//
                                 conectado = true;
                                 btConectar.setBackgroundColor(Color.GREEN);
                                 btConectar.setText("Desconectar");
                                 btConectar.setTextColor(Color.BLACK);
+
+
+                                try {
+                                    salidas = btsocket.getOutputStream();
+                                    entradas = btsocket.getInputStream();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
                             } else { //error al conectar//
                                 try {
                                     btsocket.close();
@@ -230,15 +275,11 @@ public class MainActivity extends AppCompatActivity {
                                 }
                                 MensajesPantalla(4);
                                 conectado = false;
+
+
                             }
-                            try {
-                                salidas = btsocket.getOutputStream();
-                                entradas = btsocket.getInputStream();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        } else {
                         }
+
                     }else{
                         try {
                             btsocket.close();
@@ -390,6 +431,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        spDispositivos.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                dispConect=dispositivos[i];
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
 
 
 
