@@ -42,8 +42,6 @@ public class MainActivity extends AppCompatActivity {
     protected int REQUEST_ENABLE_BT = 1;
     protected int resolucion = 10000;
 
-
-
     protected double dutyCycle;
 
     protected String cadenaRecibida = "";
@@ -76,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
 
     OutputStream salidas;
     InputStream entradas;
-
 
 
     public void MensajesPantalla(int codigo){
@@ -155,8 +152,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-
     @SuppressLint("MissingPermission")
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -181,12 +176,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getSupportActionBar().hide();
 
         btConectar = findViewById(R.id.btConectar);
         etEnvio = findViewById(R.id.etTextoAEnviar);
@@ -220,10 +215,7 @@ public class MainActivity extends AppCompatActivity {
         }
         if(btActiv) {
             Emparejados();
-
         }
-
-
 
         btConectar.setOnClickListener(new View.OnClickListener() {
 
@@ -328,37 +320,19 @@ public class MainActivity extends AppCompatActivity {
         btRecibe.setOnClickListener(new View.OnClickListener() { //espera a recibir datos, solo finaliza si recibe 'f'//
             @Override
             public void onClick(View view) {
+                if(conectado){
 
-
-
-                if (conectado) {
-                    char caracter=' ';
-                    cadenaRecibida="";
-
-                    try {
-
-                        entradas.skip(entradas.available());
-
-
-
-                        while(caracter!='f'){
-
-                            caracter =(char) entradas.read();
-                            if(caracter!='f'){
-                                cadenaRecibida = cadenaRecibida + caracter;
-                            }
-
-
-                        }
-                        tvRecibo.setText(cadenaRecibida);
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                ReciboDatos recib=new ReciboDatos(salidas,entradas,tvRecibo);
+                recib.start();
 
                 }else{
-                    MensajesPantalla(0);
+
+                MensajesPantalla(0);
+
                 }
+
+
+
             }
         });
 

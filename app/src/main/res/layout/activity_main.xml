@@ -9,7 +9,7 @@
     <Button
         android:id="@+id/btConectar"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:backgroundTint="#0000FF"
         android:text="Conectar"
         app:layout_constraintBottom_toTopOf="@+id/guideline2"
@@ -76,7 +76,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.10670315" />
+        app:layout_constraintGuide_percent="0.13" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline3"
@@ -118,14 +118,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.95" />
+        app:layout_constraintGuide_percent="0.92" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline9"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.05" />
+        app:layout_constraintGuide_percent="0.08" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline10"
@@ -213,6 +213,9 @@
         android:id="@+id/spDispositivos"
         android:layout_width="212dp"
         android:layout_height="36dp"
+        android:background="#000000"
+        android:backgroundTint="#560357FF"
+        android:hapticFeedbackEnabled="false"
         app:layout_constraintBottom_toTopOf="@+id/guideline2"
         app:layout_constraintEnd_toStartOf="@+id/btConectar"
         app:layout_constraintStart_toStartOf="@+id/guideline7"
