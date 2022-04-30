@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     protected BluetoothDevice[] dispositivos;
 
     protected Button  btConectar,btEnvioValor;
-    public TextView tvVelocidad;
+    public TextView tvVelocidad,tvVelocidadMax,tvVelocidadMin,tvDutyCycle,tvDutyCycleMax,tvDutyCycleMin,tvIntensidad,tvIntensidadMax,tvIntensidadMin;
     protected EditText etValorEnvio;
     protected SeekBar sbBarraDeslizante;
     protected Spinner spDispositivos;
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
     protected BluetoothAdapter bluetoothAdapter;
 
-    protected BluetoothSocket btsocket = null;
+    public BluetoothSocket btsocket = null;
 
     OutputStream salidas;
     InputStream entradas;
@@ -181,7 +181,19 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().hide();
 
         btConectar = findViewById(R.id.btConectar);
+
         tvVelocidad = findViewById(R.id.tvVelocidad);
+        tvVelocidadMax = findViewById(R.id.tvVelocidadMax);
+        tvVelocidadMin = findViewById(R.id.tvVelocidadMin);
+
+        tvDutyCycle = findViewById(R.id.tvDutyCycle);
+        tvDutyCycleMax = findViewById(R.id.tvDutyCycleMax);
+        tvDutyCycleMin = findViewById(R.id.tvDutyCycleMin);
+
+        tvIntensidad = findViewById(R.id.tvCorriente);
+        tvIntensidadMax = findViewById(R.id.tvCorrienterMax);
+        tvIntensidadMin = findViewById(R.id.tvDutyCycleMin);
+
         sbBarraDeslizante = findViewById(R.id.sbBarraDeslizante);
         etValorEnvio = findViewById(R.id.etValorEnvio);
         btEnvioValor = findViewById(R.id.btEnvioValor);
@@ -223,57 +235,56 @@ public class MainActivity extends AppCompatActivity {
 
                 //Comprueba que Bt este activado y pide permiso en caso de no estarlo//
                 if (!bluetoothAdapter.isEnabled()) {
+                    btActiv=false;
                     enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                     startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+                }else{
+                    btActiv=true;
                 }
 
                 if(btActiv) {
                     if (!conectado) {
-                        //Luego busca el micro en los emparejados//
-                        //PairedDisp();
-                        //intenta conectarse//
-                        if (true) {
-                            int contador = 0;
-                            do {
-                                try {
-                                    btsocket = dispConect.createRfcommSocketToServiceRecord(mUUID);
-                                    btsocket.connect();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                                contador++;
-                            } while (!btsocket.isConnected() && contador <= 3);
-                            if (btsocket.isConnected()) { //conectado correctamente//
-                                conectado = true;
-                                btConectar.setBackgroundColor(Color.GREEN);
-                                btConectar.setText("Desconectar");
-                                btConectar.setTextColor(Color.BLACK);
+                        int contador = 0;
+                    do{
+                        try {
+                            btsocket = dispConect.createRfcommSocketToServiceRecord(mUUID);
+                            btsocket.connect();
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        contador++;
+                        }while(contador<3 && !btsocket.isConnected());
+                        if (btsocket.isConnected()) { //conectado correctamente//
+                            conectado = true;
+                            btConectar.setBackgroundColor(Color.GREEN);
+                            btConectar.setText("Desconectar");
+                            btConectar.setTextColor(Color.BLACK);
+
+                            try {
+                                salidas = btsocket.getOutputStream();
+                                entradas = btsocket.getInputStream();
+
+                                recib = new ReciboDatos(salidas,entradas,tvVelocidad,tvVelocidadMax,tvVelocidadMin,tvDutyCycle,tvDutyCycleMax,tvDutyCycleMin,tvIntensidad,tvIntensidadMax,tvIntensidadMin);
+                                recib.start();
+
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
 
 
-                                try {
-                                    salidas = btsocket.getOutputStream();
-                                    entradas = btsocket.getInputStream();
+                        } else {
 
-                                    //empieza a recibir datos//
-                                    recib=new ReciboDatos(salidas,entradas,tvVelocidad);
-                                    recib.start();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
+                            try {
 
-                            } else { //error al conectar//
-                                try {
-                                    btsocket.close();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                                MensajesPantalla(4);
                                 conectado = false;
+                                btsocket.close();
+                                MensajesPantalla(4);
 
-
+                            } catch (IOException e) {
+                                e.printStackTrace();
                             }
                         }
-
                     }else{
                         try {
                             btsocket.close();
@@ -287,8 +298,8 @@ public class MainActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                     }
+                    }
                 }
-            }
         });
 
         btEnvioValor.setOnClickListener(new View.OnClickListener() {
