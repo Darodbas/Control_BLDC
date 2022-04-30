@@ -10,17 +10,37 @@
         android:id="@+id/color"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="#4A00D9FF"
+        android:background="#4ABCBCBC"
         app:layout_constraintBottom_toTopOf="@+id/guideline2"
         app:layout_constraintEnd_toStartOf="@+id/guideline10"
         app:layout_constraintStart_toStartOf="@+id/guideline7"
         app:layout_constraintTop_toTopOf="@+id/guideline9" />
 
+    <TextView
+        android:id="@+id/ColorTabla"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#E4E4E4"
+        app:layout_constraintBottom_toTopOf="@+id/guideline17"
+        app:layout_constraintEnd_toEndOf="@+id/tvCorrienterMax"
+        app:layout_constraintStart_toStartOf="@+id/tvVelocidadMax"
+        app:layout_constraintTop_toTopOf="@+id/guideline16" />
+
+    <TextView
+        android:id="@+id/ColorCabeceraTabla"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#8CA0B6"
+        app:layout_constraintBottom_toTopOf="@+id/guideline22"
+        app:layout_constraintEnd_toStartOf="@+id/guideline8"
+        app:layout_constraintStart_toStartOf="@+id/guideline7"
+        app:layout_constraintTop_toTopOf="@+id/guideline16" />
+
     <Button
         android:id="@+id/btConectar"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:backgroundTint="#0000FF"
+        android:backgroundTint="#849FBC"
         android:text="Conectar"
         app:layout_constraintBottom_toTopOf="@+id/guideline20"
         app:layout_constraintEnd_toStartOf="@+id/guideline8"
@@ -104,18 +124,11 @@
         android:max="10000"
         android:min="0"
         android:progress="5000"
-        android:progressTint="#79AEAE"
+        android:progressTint="#838383"
         app:layout_constraintBottom_toTopOf="@+id/guideline11"
         app:layout_constraintEnd_toStartOf="@+id/guideline8"
         app:layout_constraintStart_toStartOf="@+id/guideline7"
         app:layout_constraintTop_toTopOf="@+id/guideline26" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline12"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.500684" />
 
     <EditText
         android:id="@+id/etValorEnvio"
@@ -130,38 +143,17 @@
         app:layout_constraintStart_toStartOf="@+id/guideline7"
         app:layout_constraintTop_toTopOf="@+id/guideline3" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline13"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.66" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline14"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.6" />
-
     <Button
         android:id="@+id/btEnvioValor"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:backgroundTint="#07AC00"
+        android:backgroundTint="#849FBC"
         android:text="D C"
         app:layout_constraintBottom_toTopOf="@+id/guideline6"
         app:layout_constraintEnd_toStartOf="@+id/guideline8"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="@+id/guideline25"
         app:layout_constraintTop_toTopOf="@+id/guideline3" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline15"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_begin="681dp" />
 
     <Spinner
         android:id="@+id/spDispositivos"
@@ -280,7 +272,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:gravity="center"
-        android:text="Vel. (rpm) : 1000"
+        android:text="Velocidad"
         android:textColor="#000000"
         app:layout_constraintBottom_toTopOf="@+id/tvVelocidadMax"
         app:layout_constraintEnd_toStartOf="@+id/guideline23"
@@ -292,7 +284,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:gravity="center"
-        android:text="Dut.Cyc. : 0.2"
+        android:text="Duty Cycle"
         android:textColor="#000000"
         app:layout_constraintBottom_toTopOf="@+id/guideline22"
         app:layout_constraintEnd_toStartOf="@+id/guideline25"
@@ -304,7 +296,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:gravity="center"
-        android:text="Corr. (A) : 1.2"
+        android:text="Corriente"
         android:textColor="#000000"
         app:layout_constraintBottom_toTopOf="@+id/guideline22"
         app:layout_constraintEnd_toStartOf="@+id/guideline8"

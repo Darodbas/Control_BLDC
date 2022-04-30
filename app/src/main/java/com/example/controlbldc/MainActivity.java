@@ -192,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
 
         tvIntensidad = findViewById(R.id.tvCorriente);
         tvIntensidadMax = findViewById(R.id.tvCorrienterMax);
-        tvIntensidadMin = findViewById(R.id.tvDutyCycleMin);
+        tvIntensidadMin = findViewById(R.id.tvCorrienterMin);
 
         sbBarraDeslizante = findViewById(R.id.sbBarraDeslizante);
         etValorEnvio = findViewById(R.id.etValorEnvio);
@@ -257,9 +257,9 @@ public class MainActivity extends AppCompatActivity {
                         }while(contador<3 && !btsocket.isConnected());
                         if (btsocket.isConnected()) { //conectado correctamente//
                             conectado = true;
-                            btConectar.setBackgroundColor(Color.GREEN);
+                            btConectar.setBackgroundColor(Color.BLACK);
                             btConectar.setText("Desconectar");
-                            btConectar.setTextColor(Color.BLACK);
+
 
                             try {
                                 salidas = btsocket.getOutputStream();
@@ -289,9 +289,9 @@ public class MainActivity extends AppCompatActivity {
                         try {
                             btsocket.close();
                             conectado=false;
-                            btConectar.setBackgroundColor(Color.BLUE);
+                            btConectar.setBackgroundColor(Color.rgb(132,159,188));
                             btConectar.setText("Conectar");
-                            btConectar.setTextColor(Color.WHITE);
+
 
 
                         } catch (IOException e) {
