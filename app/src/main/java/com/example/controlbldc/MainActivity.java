@@ -11,8 +11,10 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -20,6 +22,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -45,15 +48,17 @@ public class MainActivity extends AppCompatActivity {
     protected String[] direccionesDisp;
     protected BluetoothDevice[] dispositivos;
 
-    protected Button  btConectar,btEnvioValor;
+    protected Button  btEnvioValor;
     public TextView tvVelocidad,tvVelocidadMax,tvVelocidadMin,tvDutyCycle,tvDutyCycleMax,tvDutyCycleMin,tvIntensidad,tvIntensidadMax,tvIntensidadMin;
     protected EditText etValorEnvio;
     protected SeekBar sbBarraDeslizante;
     protected Spinner spDispositivos;
+    protected ImageView ivConectar,ivEncender,ivRestart;
 
     protected boolean conectado=false;
     protected boolean btActiv = false;
     protected boolean valorEdittext=false;
+    protected boolean encendido = false;
 
     protected UUID mUUID = fromString("00001101-0000-1000-8000-00805F9B34FB");
 
@@ -105,6 +110,23 @@ public class MainActivity extends AppCompatActivity {
         mensajePant.setGravity(Gravity.BOTTOM,0,0);
         mensajePant.show();
 
+
+    }
+
+    public void LimpiarTabla(){
+
+        tvVelocidad.setText("Velocidad");
+        tvDutyCycle.setText("Duty Cycle");
+        tvIntensidad.setText("Corriente");
+
+        tvVelocidadMax.setText("Max:");
+        tvVelocidadMin.setText("Min:");
+
+        tvDutyCycleMax.setText("Max:");
+        tvDutyCycleMin.setText("Min:");
+
+        tvIntensidadMax.setText("Max:");
+        tvIntensidadMin.setText("Min:");
 
     }
 
@@ -179,8 +201,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getSupportActionBar().hide();
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        getWindow().setStatusBarColor(Color.rgb(102-10,129-10,158-10));
 
-        btConectar = findViewById(R.id.btConectar);
+        ivConectar = findViewById(R.id.ivConectar);
+        ivEncender = findViewById(R.id.ivEncender);
+        ivRestart = findViewById(R.id.ivRestart);
 
         tvVelocidad = findViewById(R.id.tvVelocidad);
         tvVelocidadMax = findViewById(R.id.tvVelocidadMax);
@@ -227,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        btConectar.setOnClickListener(new View.OnClickListener() {
+        ivConectar.setOnClickListener(new View.OnClickListener() {
 
             @SuppressLint("MissingPermission")
             @Override
@@ -255,10 +281,10 @@ public class MainActivity extends AppCompatActivity {
                         }
                         contador++;
                         }while(contador<3 && !btsocket.isConnected());
+
                         if (btsocket.isConnected()) { //conectado correctamente//
                             conectado = true;
-                            btConectar.setBackgroundColor(Color.BLACK);
-                            btConectar.setText("Desconectar");
+                            ivConectar.setImageResource(R.drawable.conectado);
 
 
                             try {
@@ -289,9 +315,8 @@ public class MainActivity extends AppCompatActivity {
                         try {
                             btsocket.close();
                             conectado=false;
-                            btConectar.setBackgroundColor(Color.rgb(132,159,188));
-                            btConectar.setText("Conectar");
-
+                            ivConectar.setImageResource(R.drawable.desconectado);
+                            LimpiarTabla();
 
 
                         } catch (IOException e) {
@@ -300,6 +325,50 @@ public class MainActivity extends AppCompatActivity {
                     }
                     }
                 }
+        });
+
+        ivEncender.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if(conectado) {//Solo si esta ya conectado
+
+                    if (!encendido) {//si no esta encendido manda un 1 y cambia la imagen a ROJO
+
+                        try {
+                            salidas.write('1');
+                            ivEncender.setImageResource(R.drawable.off);
+                            encendido=true;
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+
+                    }else {// si ya esta encendido manda un 0 y cambia la imagen a NEGRO
+                        try {
+                            salidas.write('0');
+                            ivEncender.setImageResource(R.drawable.on);
+                            encendido=false;
+
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                    } else {
+                        MensajesPantalla(0);
+                    }
+                }
+
+        });
+
+        ivRestart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LimpiarTabla();
+            }
         });
 
         btEnvioValor.setOnClickListener(new View.OnClickListener() {
