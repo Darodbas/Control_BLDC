@@ -12,7 +12,7 @@ public class ReciboDatos extends Thread{
     InputStream entradas;
     TextView tvVelocidad,tvVelocidadMax,tvVelocidadMin,tvDutyCycle,tvDutyCycleMax,tvDutyCycleMin,tvIntensidad,tvIntensidadMax,tvIntensidadMin;
 
-    Double velMax,velMin,iMax,iMin,dMax,dMin,vel,I,D;
+    Double velMax,velMin,iMax,iMin,dMax,dMin,vel,I,D,tiempo;
 
     public ReciboDatos(OutputStream salidas, InputStream entradas,TextView tvVelocidad,TextView tvVelocidadMax,TextView tvVelocidadMin,TextView tvDutyCycle,TextView tvDutyCycleMax,TextView tvDutyCycleMin,TextView tvIntensidad,TextView tvIntensidadMax,TextView tvIntensidadMin){
         this.entradas=entradas;
@@ -33,6 +33,7 @@ public class ReciboDatos extends Thread{
         vel=0.0;
         I=0.0;
         D=0.0;
+        tiempo=0.0;
 
 
     }
@@ -53,7 +54,7 @@ public class ReciboDatos extends Thread{
 
                 entradas.skip(entradas.available());
 
-                while (caracter != 'V' && caracter!= 'I' && caracter!= 'D' ) {//Lee caracteres hasta llegar a una V, I o D//
+                while (caracter != 'V' && caracter!= 'I' && caracter!= 'D' && caracter !='T' ) {//Lee caracteres hasta llegar a una V, I o D//
                     caracter = (char) entradas.read();
                 }
                 identificador=caracter; //guardamos el caracter con el que ha llegado//
@@ -122,6 +123,11 @@ public class ReciboDatos extends Thread{
 
                         break;
 
+                    case 'T':
+
+                        tiempo=Double.parseDouble(cadenaRecibida);
+                        tiempo=tiempo/1000;//Pasar a segundos
+                        break;
 
                 }
 
