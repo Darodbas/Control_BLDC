@@ -14,7 +14,6 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -28,13 +27,25 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
+
+
+
+
 
     protected ReciboDatos recib;
 
@@ -75,6 +86,24 @@ public class MainActivity extends AppCompatActivity {
     InputStream entradas;
 
     SharedPreferences preferencias;
+
+
+    //objetos para la grafica
+     protected LineChart grafica;
+
+
+
+    //funcion que devuelve valores de grafica
+    private ArrayList<Entry> datosGrafica(){
+
+        ArrayList<Entry> dataVals = new ArrayList<Entry>();
+        dataVals.add(new Entry(0,20));
+        dataVals.add(new Entry(1,30));
+        dataVals.add(new Entry(2,20));
+        dataVals.add(new Entry(3,10));
+        return dataVals;
+    }
+
 
     public void MensajesPantalla(int codigo){
 
@@ -227,6 +256,9 @@ public class MainActivity extends AppCompatActivity {
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
+        grafica = findViewById(R.id.grafica);
+
+
         preferencias = getSharedPreferences("PREFERENCIAS",MODE_PRIVATE);
 
         //Comprobaciuones iniciales//
@@ -253,6 +285,16 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+        /*LineDataSet Datos1 = new LineDataSet(datosGrafica(),"Set 1"); //creamos un set de datos nuevo
+
+        setsDatosGrafica.add(Datos1);//asociamos el nuevo set al conjunto de todos los sets
+
+        DatosGraf = new LineData(setsDatosGrafica);
+        grafica.setData(DatosGraf);
+        grafica.invalidate();*/
+
+
+//BOTONES
         ivConectar.setOnClickListener(new View.OnClickListener() {
 
             @SuppressLint("MissingPermission")
@@ -291,7 +333,7 @@ public class MainActivity extends AppCompatActivity {
                                 salidas = btsocket.getOutputStream();
                                 entradas = btsocket.getInputStream();
 
-                                recib = new ReciboDatos(salidas,entradas,tvVelocidad,tvVelocidadMax,tvVelocidadMin,tvDutyCycle,tvDutyCycleMax,tvDutyCycleMin,tvIntensidad,tvIntensidadMax,tvIntensidadMin);
+                                recib = new ReciboDatos(grafica,salidas,entradas,tvVelocidad,tvVelocidadMax,tvVelocidadMin,tvDutyCycle,tvDutyCycleMax,tvDutyCycleMin,tvIntensidad,tvIntensidadMax,tvIntensidadMin);
                                 recib.start();
 
                             } catch (IOException e) {

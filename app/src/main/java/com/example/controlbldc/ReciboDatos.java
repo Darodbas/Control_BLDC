@@ -2,9 +2,16 @@ package com.example.controlbldc;
 
 import android.widget.TextView;
 
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 
 public class ReciboDatos extends Thread{
 
@@ -14,10 +21,20 @@ public class ReciboDatos extends Thread{
 
     Double velMax,velMin,iMax,iMin,dMax,dMin,vel,I,D,tiempo;
 
-    public ReciboDatos(OutputStream salidas, InputStream entradas,TextView tvVelocidad,TextView tvVelocidadMax,TextView tvVelocidadMin,TextView tvDutyCycle,TextView tvDutyCycleMax,TextView tvDutyCycleMin,TextView tvIntensidad,TextView tvIntensidadMax,TextView tvIntensidadMin){
-        this.entradas=entradas;
-        this.salidas=salidas;
-        this.tvVelocidad=tvVelocidad;
+    //datos grafica
+    protected LineChart grafica;
+    protected ArrayList<ILineDataSet> setsDatosGrafica = new ArrayList<>();
+    protected LineDataSet SetVel,SetCorr,SetDC;
+    protected LineData DatosGraf;
+
+    ArrayList<Entry> dataCorr = new ArrayList<Entry>();
+    ArrayList<Entry> dataDC = new ArrayList<Entry>();
+    ArrayList<Entry> dataVel = new ArrayList<Entry>();
+
+    public ReciboDatos(LineChart grafica, OutputStream salidas, InputStream entradas, TextView tvVelocidad, TextView tvVelocidadMax, TextView tvVelocidadMin, TextView tvDutyCycle, TextView tvDutyCycleMax, TextView tvDutyCycleMin, TextView tvIntensidad, TextView tvIntensidadMax, TextView tvIntensidadMin){
+        this.entradas = entradas;
+        this.salidas = salidas;
+        this.tvVelocidad = tvVelocidad;
         this.tvVelocidadMax = tvVelocidadMax;
         this.tvVelocidadMin = tvVelocidadMin;
         this.tvDutyCycle = tvDutyCycle;
@@ -26,6 +43,7 @@ public class ReciboDatos extends Thread{
         this.tvIntensidad = tvIntensidad;
         this.tvIntensidadMax = tvIntensidadMax;
         this.tvIntensidadMin = tvIntensidadMin;
+        this.grafica = grafica;
 
         velMax=iMax=dMax= -999999999.0;
         velMin=iMin=dMin=99999999.9;
@@ -42,9 +60,57 @@ public class ReciboDatos extends Thread{
         this.salidas=null;
         this.tvVelocidad=null;
     }
+
+    public ArrayList<Entry> ActualizaDatosGrafica(int codigo){
+        ArrayList<Entry> dataVals = new ArrayList<Entry>();
+
+        switch (codigo){
+
+            case 0://corriente
+
+                dataCorr.add(new Entry(0,1));
+                dataVals=dataCorr;
+                break;
+
+            case 1://DC
+                dataDC.add(new Entry(0,4));
+                dataVals=dataDC;
+                break;
+
+            case 2:
+                dataVel.add(new Entry(0,2));
+                dataVals=dataVel;
+                break;
+
+        }
+
+        return dataVals;
+
+    }
+
+    public  void ActualizaGrafica(){
+
+        SetCorr = new LineDataSet(ActualizaDatosGrafica(0),"Corriente"); //Actualizamos el set corriente
+        SetDC = new LineDataSet(ActualizaDatosGrafica(1),"Duty Cycle"); //Actualizamos el set Velocidad
+        SetVel = new LineDataSet(ActualizaDatosGrafica(2),"Velocidad"); //Actualizamos el set Velocidad
+
+        //añadimos al conjunto de todos los sets los nuevos actualizados
+        setsDatosGrafica.add(SetCorr);
+        setsDatosGrafica.add(SetDC);
+        setsDatosGrafica.add(SetVel);
+
+
+        DatosGraf = new LineData(setsDatosGrafica);//se asocian a los datos totales los nuevos sets
+        grafica.setData(DatosGraf);
+        grafica.invalidate();
+    }
+
     public void run(){
 
+
+
         while(true) {
+            ActualizaGrafica();
             char caracter = '?';
             char identificador = '?';
             String cadenaRecibida = "";
@@ -136,6 +202,10 @@ public class ReciboDatos extends Thread{
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+
+
+
         }
 
     }
