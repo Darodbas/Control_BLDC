@@ -15,6 +15,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -28,24 +29,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
-
-
-
+    protected boolean recibExiste=false;
 
     protected ReciboDatos recib;
 
@@ -89,20 +82,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     //objetos para la grafica
-     protected LineChart grafica;
+     protected LineChart graficaVel, graficaCorr, graficaDC;
 
-
-
-    //funcion que devuelve valores de grafica
-    private ArrayList<Entry> datosGrafica(){
-
-        ArrayList<Entry> dataVals = new ArrayList<Entry>();
-        dataVals.add(new Entry(0,20));
-        dataVals.add(new Entry(1,30));
-        dataVals.add(new Entry(2,20));
-        dataVals.add(new Entry(3,10));
-        return dataVals;
-    }
 
 
     public void MensajesPantalla(int codigo){
@@ -256,10 +237,16 @@ public class MainActivity extends AppCompatActivity {
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        grafica = findViewById(R.id.grafica);
+        graficaVel = findViewById(R.id.graficaCorr);
+        graficaCorr = findViewById(R.id.graficaVel);
+        graficaDC = findViewById(R.id.graficaDC);
 
 
         preferencias = getSharedPreferences("PREFERENCIAS",MODE_PRIVATE);
+
+        graficaVel.setVisibility(View.INVISIBLE);
+        graficaDC.setVisibility(View.INVISIBLE);
+        graficaCorr.setVisibility(View.INVISIBLE);
 
         //Comprobaciuones iniciales//
         if (bluetoothAdapter == null) {
@@ -295,11 +282,31 @@ public class MainActivity extends AppCompatActivity {
 
 
 //BOTONES
+
+
         ivConectar.setOnClickListener(new View.OnClickListener() {
 
             @SuppressLint("MissingPermission")
             @Override
             public void onClick(View view) {
+
+            //ANIMACION
+                ivConectar.setScaleY(1.25F);
+                ivConectar.setScaleX(1.25F);
+                CountDownTimer CDTencender = new CountDownTimer(100,100) {
+                    @Override
+                    public void onTick(long l) {
+
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        ivConectar.setScaleY(1F);
+                        ivConectar.setScaleX(1F);
+                    }
+                }.start();
+
+
 
                 //Comprueba que Bt este activado y pide permiso en caso de no estarlo//
                 if (!bluetoothAdapter.isEnabled()) {
@@ -310,8 +317,11 @@ public class MainActivity extends AppCompatActivity {
                     btActiv=true;
                 }
 
+                //Empieza la conexion
                 if(btActiv) {
                     if (!conectado) {
+
+
                         int contador = 0;
                     do{
                         try {
@@ -322,20 +332,26 @@ public class MainActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                         contador++;
-                        }while(contador<3 && !btsocket.isConnected());
+                        }while(contador<1 && !btsocket.isConnected());
 
                         if (btsocket.isConnected()) { //conectado correctamente//
                             conectado = true;
                             ivConectar.setImageResource(R.drawable.conectado);
 
-
                             try {
                                 salidas = btsocket.getOutputStream();
                                 entradas = btsocket.getInputStream();
 
-                                recib = new ReciboDatos(grafica,salidas,entradas,tvVelocidad,tvVelocidadMax,tvVelocidadMin,tvDutyCycle,tvDutyCycleMax,tvDutyCycleMin,tvIntensidad,tvIntensidadMax,tvIntensidadMin);
-                                recib.start();
-
+                                //crea el objeto para recibir datos y manejar graficas//
+                                if(!recibExiste){
+                                    recib = new ReciboDatos(graficaVel,graficaDC,graficaCorr,salidas,entradas,tvVelocidad,tvVelocidadMax,tvVelocidadMin,tvDutyCycle,tvDutyCycleMax,tvDutyCycleMin,tvIntensidad,tvIntensidadMax,tvIntensidadMin);
+                                    recib.start();
+                                    recibExiste=true;
+                                }else{
+                                    recib.SetSalidasEntradas(salidas,entradas);
+                                    recib.Continua();
+                                }
+                                recib.MuestraOcultaGraficas(0);
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -355,7 +371,15 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }else{
                         try {
+
+                            if(encendido){//si está encendido se apaga al desconectar
+                                ivEncender.performClick();
+                            }
+
+
                             btsocket.close();
+                            recib.MuestraOcultaGraficas(1);
+                            recib.Pausa();
                             conectado=false;
                             ivConectar.setImageResource(R.drawable.desconectado);
                             LimpiarTabla();
@@ -372,6 +396,21 @@ public class MainActivity extends AppCompatActivity {
         ivEncender.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                ivEncender.setScaleY(1.25F);
+                ivEncender.setScaleX(1.25F);
+                CountDownTimer CDTencender = new CountDownTimer(100,100) {
+                    @Override
+                    public void onTick(long l) {
+
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        ivEncender.setScaleY(1F);
+                        ivEncender.setScaleX(1F);
+                    }
+                }.start();
 
                 if(conectado) {//Solo si esta ya conectado
 
@@ -409,7 +448,28 @@ public class MainActivity extends AppCompatActivity {
         ivRestart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                ivRestart.setScaleY(1.25F);
+                ivRestart.setScaleX(1.25F);
+                CountDownTimer CDTencender = new CountDownTimer(100,100) {
+                    @Override
+                    public void onTick(long l) {
+
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        ivRestart.setScaleY(1F);
+                        ivRestart.setScaleX(1F);
+                    }
+                }.start();
+
+
+
+
+
                 LimpiarTabla();
+
             }
         });
 
