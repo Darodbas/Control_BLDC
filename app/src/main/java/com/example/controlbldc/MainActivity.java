@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     protected ReciboDatos recib;
 
     protected int REQUEST_ENABLE_BT = 1;
-    protected int resolucion = 10000;
+    protected int resolucion = 100;
 
     protected double dutyCycle;
 
@@ -271,16 +271,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-
-        /*LineDataSet Datos1 = new LineDataSet(datosGrafica(),"Set 1"); //creamos un set de datos nuevo
-
-        setsDatosGrafica.add(Datos1);//asociamos el nuevo set al conjunto de todos los sets
-
-        DatosGraf = new LineData(setsDatosGrafica);
-        grafica.setData(DatosGraf);
-        grafica.invalidate();*/
-
-
 //BOTONES
 
 
@@ -482,14 +472,14 @@ public class MainActivity extends AppCompatActivity {
 
                         dutyCycle = Double.parseDouble(String.valueOf(etValorEnvio.getText()));
 
-                        if (dutyCycle >= 0 && dutyCycle <= 1) {
+                        if (dutyCycle >= -2.1 && dutyCycle <= 2.1) {
 
                             valorEdittext=true;
                             sbBarraDeslizante.setProgress((int)(dutyCycle*resolucion));
 
                             String textoEnvio;
                             int caracter;
-                            textoEnvio = "D"+ etValorEnvio.getText()+"d";
+                            textoEnvio = "I"+ etValorEnvio.getText()+"i";
 
 
                             try {
