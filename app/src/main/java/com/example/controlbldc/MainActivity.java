@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     protected ReciboDatos recib;
 
     protected int REQUEST_ENABLE_BT = 1;
-    protected int resolucion = 100;
+    protected int resolucion = 1;
 
     protected double dutyCycle;
 
@@ -472,14 +472,14 @@ public class MainActivity extends AppCompatActivity {
 
                         dutyCycle = Double.parseDouble(String.valueOf(etValorEnvio.getText()));
 
-                        if (dutyCycle >= -2.1 && dutyCycle <= 2.1) {
+                        if (dutyCycle >= -3000 && dutyCycle <= 3000) {
 
                             valorEdittext=true;
                             sbBarraDeslizante.setProgress((int)(dutyCycle*resolucion));
 
                             String textoEnvio;
                             int caracter;
-                            textoEnvio = "I"+ etValorEnvio.getText()+"i";
+                            textoEnvio = "V"+ etValorEnvio.getText()+"f";
 
 
                             try {
@@ -500,7 +500,7 @@ public class MainActivity extends AppCompatActivity {
                     valorEdittext=true;
                     dutyCycle = Double.parseDouble(String.valueOf(etValorEnvio.getText()));
 
-                    if (dutyCycle >= 0 && dutyCycle <= 1) {
+                    if (dutyCycle >= -3000 && dutyCycle <= 3000) {
 
                         sbBarraDeslizante.setProgress((int) (dutyCycle * resolucion));
                     }
