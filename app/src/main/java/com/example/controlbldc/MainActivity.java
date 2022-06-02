@@ -616,11 +616,16 @@ public class MainActivity extends AppCompatActivity {
                     sbBarraDeslizante.setMax(30);
                     sbBarraDeslizante.setMin(-30);
                     resolucion=0.01f;
+                    sbBarraDeslizante.setProgress(0);
+
 
                 }else{
                     sbBarraDeslizante.setMax(3000);
                     sbBarraDeslizante.setMin(-3000);
                     resolucion=1f;
+                    sbBarraDeslizante.setProgress(0);
+
+
                 }
             }
         });

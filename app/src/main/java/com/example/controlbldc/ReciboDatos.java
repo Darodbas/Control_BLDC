@@ -97,8 +97,8 @@ public class ReciboDatos extends  Thread{
         SetCorr.setColors(Color.BLUE);
         SetVel.setColors(Color.GREEN);
 
-        SetCorr.setCircleColors(Color.RED);
-        SetDC.setCircleColors(Color.BLUE);
+        SetDC.setCircleColors(Color.RED);
+        SetCorr.setCircleColors(Color.BLUE);
         SetVel.setCircleColors(Color.GREEN);
 
         SetDC.setDrawCircles(bool);
