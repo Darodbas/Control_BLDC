@@ -21,10 +21,13 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,11 +42,13 @@ import java.util.UUID;
 public class MainActivity extends AppCompatActivity {
 
     protected boolean recibExiste=false;
+    protected boolean puntos=false;
+    protected boolean ejeFijo=false;
 
     protected ReciboDatos recib;
 
     protected int REQUEST_ENABLE_BT = 1;
-    protected int resolucion = 1;
+    protected float resolucion = 1;
 
     protected double dutyCycle;
 
@@ -53,11 +58,13 @@ public class MainActivity extends AppCompatActivity {
     protected BluetoothDevice[] dispositivos;
 
     protected Button  btEnvioValor;
+    protected CheckBox chPuntos,chEjefijo;
     public TextView tvVelocidad,tvVelocidadMax,tvVelocidadMin,tvDutyCycle,tvDutyCycleMax,tvDutyCycleMin,tvIntensidad,tvIntensidadMax,tvIntensidadMin;
     protected EditText etValorEnvio;
     protected SeekBar sbBarraDeslizante;
     protected Spinner spDispositivos;
     protected ImageView ivConectar,ivEncender,ivRestart;
+    protected Switch swIman;
 
     protected boolean conectado=false;
     protected boolean btActiv = false;
@@ -138,6 +145,11 @@ public class MainActivity extends AppCompatActivity {
         tvIntensidadMax.setText("Max:");
         tvIntensidadMin.setText("Min:");
 
+        if(recibExiste&&conectado){
+            recib.reiniciarGraficas();
+
+        }
+
     }
 
     @SuppressLint("MissingPermission")
@@ -217,6 +229,11 @@ public class MainActivity extends AppCompatActivity {
         ivConectar = findViewById(R.id.ivConectar);
         ivEncender = findViewById(R.id.ivEncender);
         ivRestart = findViewById(R.id.ivRestart);
+
+        chPuntos = findViewById(R.id.chPuntos);
+        chEjefijo = findViewById(R.id.chEjesFijos);
+
+        swIman = findViewById(R.id.swIman);
 
         tvVelocidad = findViewById(R.id.tvVelocidad);
         tvVelocidadMax = findViewById(R.id.tvVelocidadMax);
@@ -334,7 +351,7 @@ public class MainActivity extends AppCompatActivity {
 
                                 //crea el objeto para recibir datos y manejar graficas//
                                 if(!recibExiste){
-                                    recib = new ReciboDatos(graficaVel,graficaDC,graficaCorr,salidas,entradas,tvVelocidad,tvVelocidadMax,tvVelocidadMin,tvDutyCycle,tvDutyCycleMax,tvDutyCycleMin,tvIntensidad,tvIntensidadMax,tvIntensidadMin);
+                                    recib = new ReciboDatos(graficaVel,graficaDC,graficaCorr,salidas,entradas,tvVelocidad,tvVelocidadMax,tvVelocidadMin,tvDutyCycle,tvDutyCycleMax,tvDutyCycleMin,tvIntensidad,tvIntensidadMax,tvIntensidadMin,ejeFijo,puntos);
                                     recib.start();
                                     recibExiste=true;
                                 }else{
@@ -342,6 +359,8 @@ public class MainActivity extends AppCompatActivity {
                                     recib.Continua();
                                 }
                                 recib.MuestraOcultaGraficas(0);
+                                //recib.EjeFijo(ejeFijo);
+                                //recib.Puntos(puntos);
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -475,7 +494,7 @@ public class MainActivity extends AppCompatActivity {
                         if (dutyCycle >= -3000 && dutyCycle <= 3000) {
 
                             valorEdittext=true;
-                            sbBarraDeslizante.setProgress((int)(dutyCycle*resolucion));
+                            sbBarraDeslizante.setProgress((int)(Math.round(dutyCycle*resolucion)));
 
                             String textoEnvio;
                             int caracter;
@@ -515,7 +534,8 @@ public class MainActivity extends AppCompatActivity {
 
                 if(valorEdittext==false){//si el valor lo cambia el edit text no hace nada
                     dutyCycle = (double) i/resolucion;
-                    etValorEnvio.setText(Double.toString(dutyCycle));
+                    dutyCycle = (int) Math.round(dutyCycle);
+                    etValorEnvio.setText(Integer.toString((int)dutyCycle));
                 }
             }
 
@@ -527,7 +547,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                etValorEnvio.setText(Double.toString(dutyCycle));
+
+                etValorEnvio.setText(Integer.toString((int)dutyCycle));
 
             }
         });
@@ -544,6 +565,58 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
 
+            }
+        });
+
+        chEjefijo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if(chEjefijo.isChecked()){
+                    ejeFijo=true;
+                }else{
+                    ejeFijo=false;
+                }
+
+                if(recibExiste&&conectado){
+                    recib.EjeFijo(ejeFijo);
+                }
+
+
+            }
+        });
+
+        chPuntos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if(chPuntos.isChecked()){
+                    puntos=true;
+                }else{
+                    puntos=false;
+                }
+
+                if(recibExiste&&conectado){
+                    recib.MuestraPuntos(puntos);
+                }
+
+
+            }
+        });
+
+        swIman.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if(b){
+                    sbBarraDeslizante.setMax(30);
+                    sbBarraDeslizante.setMin(-30);
+                    resolucion=0.01f;
+
+                }else{
+                    sbBarraDeslizante.setMax(3000);
+                    sbBarraDeslizante.setMin(-3000);
+                    resolucion=1f;
+                }
             }
         });
 

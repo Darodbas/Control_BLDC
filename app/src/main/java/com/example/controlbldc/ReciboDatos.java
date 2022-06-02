@@ -1,6 +1,7 @@
 package com.example.controlbldc;
 
 import android.graphics.Color;
+import android.os.CountDownTimer;
 import android.view.View;
 import android.widget.TextView;
 
@@ -24,9 +25,12 @@ public class ReciboDatos extends  Thread{
     InputStream entradas;
     TextView tvVelocidad,tvVelocidadMax,tvVelocidadMin,tvDutyCycle,tvDutyCycleMax,tvDutyCycleMin,tvIntensidad,tvIntensidadMax,tvIntensidadMin;
 
-    Double velMax,velMin,iMax,iMin,dMax,dMin,vel,I,D,tiempo;
+    double velMax,velMin,iMax,iMin,dMax,dMin,vel,I,D,tiempo,tiempoInicial;
+    double bufferEjeX=10;
 
     boolean pausa=false;
+    boolean primerDato=true;
+    boolean ejeFijo,mostrarPuntos;
 
     //datos grafica
     protected LineChart graficaVel,graficaCorr,graficaDC;
@@ -41,7 +45,7 @@ public class ReciboDatos extends  Thread{
     ArrayList<Entry> dataDC = new ArrayList<Entry>();
     ArrayList<Entry> dataVel = new ArrayList<Entry>();
 
-    public ReciboDatos(LineChart graficaVel,LineChart graficaDC,LineChart graficaCorr, OutputStream salidas, InputStream entradas, TextView tvVelocidad, TextView tvVelocidadMax, TextView tvVelocidadMin, TextView tvDutyCycle, TextView tvDutyCycleMax, TextView tvDutyCycleMin, TextView tvIntensidad, TextView tvIntensidadMax, TextView tvIntensidadMin){
+    public ReciboDatos(LineChart graficaVel,LineChart graficaDC,LineChart graficaCorr, OutputStream salidas, InputStream entradas, TextView tvVelocidad, TextView tvVelocidadMax, TextView tvVelocidadMin, TextView tvDutyCycle, TextView tvDutyCycleMax, TextView tvDutyCycleMin, TextView tvIntensidad, TextView tvIntensidadMax, TextView tvIntensidadMin,boolean ejeFijo,boolean mostrarPuntos){
         this.entradas = entradas;
         this.salidas = salidas;
         this.tvVelocidad = tvVelocidad;
@@ -56,6 +60,9 @@ public class ReciboDatos extends  Thread{
         this.graficaVel = graficaVel;
         this.graficaCorr = graficaCorr;
         this.graficaDC = graficaDC;
+        this.ejeFijo = ejeFijo;
+        this.mostrarPuntos = mostrarPuntos;
+
 
         velMax=iMax=dMax= -999999999.0;
         velMin=iMin=dMin=99999999.9;
@@ -74,16 +81,132 @@ public class ReciboDatos extends  Thread{
         this.tvVelocidad=null;
     }
 
-    public void FormatoEjes(){
+
+    public void reiniciarGraficas(){
+
+            primerDato=true;
+            SetVel= new LineDataSet(null,"");
+            SetDC =new LineDataSet(null,"");
+            SetCorr = new LineDataSet(null,"");
+
+    }
+
+    public void Puntos(boolean bool){ //se establece el formato de los puntos
+
+        SetDC.setColors(Color.RED);
+        SetCorr.setColors(Color.BLUE);
+        SetVel.setColors(Color.GREEN);
+
+        SetCorr.setCircleColors(Color.RED);
+        SetDC.setCircleColors(Color.BLUE);
+        SetVel.setCircleColors(Color.GREEN);
+
+        SetDC.setDrawCircles(bool);
+        SetCorr.setDrawCircles(bool);
+        SetVel.setDrawCircles(bool);
+
+        SetDC.setDrawValues(bool);
+        SetCorr.setDrawValues(bool);
+        SetVel.setDrawValues(bool);
+
+        SetDC.setLineWidth(1f);
+        SetCorr.setLineWidth(1f);
+        SetVel.setLineWidth(1f);
+
+
+    }
+
+    public void MuestraPuntos(boolean bool){
+        mostrarPuntos=bool;
+    }
+
+    public void EjeFijo(boolean bool){
+
+        ejeFijo=bool;
+
+    }
+
+
+    public void FormatoEjes(boolean bool){
+
+        graficaDC.getDescription().setEnabled(false);
+        graficaVel.getDescription().setEnabled(false);
+        graficaCorr.getDescription().setEnabled(false);
+
 
         XAxis EjeXVel = graficaVel.getXAxis();
         YAxis EjeYVel = graficaVel.getAxisLeft();
+        YAxis EjeYVelR = graficaVel.getAxisRight();
         XAxis EjeXCorr = graficaCorr.getXAxis();
         YAxis EjeYCorr = graficaCorr.getAxisLeft();
+        YAxis EjeYCorrR = graficaCorr.getAxisRight();
         XAxis EjeXDC = graficaDC.getXAxis();
         YAxis EjeYDC = graficaDC.getAxisLeft();
+        YAxis EjeYDCR = graficaDC.getAxisRight();
 
-        EjeXVel.setDrawLabels(false);
+        EjeXDC.setPosition(XAxis.XAxisPosition.BOTTOM);
+        EjeXVel.setPosition(XAxis.XAxisPosition.BOTTOM);
+        EjeXCorr.setPosition(XAxis.XAxisPosition.BOTTOM);
+
+        EjeYDCR.setDrawLabels(false);
+        EjeYCorrR.setDrawLabels(false);
+        EjeYVelR.setDrawLabels(false);
+
+        EjeYDCR.setAxisLineWidth(0.1f);
+        EjeYVelR.setAxisLineWidth(0.1f);
+        EjeYCorrR.setAxisLineWidth(0.1f);
+
+        EjeYCorr.setAxisLineWidth(1f);
+        EjeYVel.setAxisLineWidth(1f);
+        EjeYDC.setAxisLineWidth(1f);
+
+        EjeXDC.setAxisLineWidth(1f);
+        EjeXVel.setAxisLineWidth(1f);
+        EjeXCorr.setAxisLineWidth(1f);
+
+
+
+        EjeYDCR.setDrawGridLines(false);
+        EjeYCorrR.setDrawGridLines(false);
+        EjeYVelR.setDrawGridLines(false);
+
+        EjeYDC.setAxisMaximum((float)1);
+        EjeYDC.setAxisMinimum((float)0);
+        EjeYDC.setGridLineWidth(0.1f);
+
+        EjeYCorr.setAxisMaximum(3);
+        EjeYCorr.setAxisMinimum(-3);
+        EjeYCorr.setGridLineWidth(0.1f);
+
+
+        EjeYVel.setAxisMaximum(3000);
+        EjeYVel.setAxisMinimum(-3000);
+        EjeYVel.setGridLineWidth(0.1f);
+
+        EjeXDC.setGridLineWidth(0.1f);
+        EjeXVel.setGridLineWidth(0.1f);
+        EjeXCorr.setGridLineWidth(0.1f);
+
+
+        if(bool) {
+            EjeXVel.setAxisMaximum((float) (tiempo - tiempo % bufferEjeX + bufferEjeX));
+            EjeXVel.setAxisMinimum((float) (tiempo - tiempo % bufferEjeX));
+
+            EjeXCorr.setAxisMaximum((float) (tiempo - tiempo % bufferEjeX + bufferEjeX));
+            EjeXCorr.setAxisMinimum((float) (tiempo - tiempo % bufferEjeX));
+
+            EjeXDC.setAxisMaximum((float) (tiempo - tiempo % bufferEjeX + bufferEjeX));
+            EjeXDC.setAxisMinimum((float) (tiempo - tiempo % bufferEjeX));
+        }else{
+            EjeXVel.setAxisMaximum((float) tiempo);
+            EjeXVel.setAxisMinimum(0);
+
+            EjeXCorr.setAxisMaximum((float) tiempo);
+            EjeXCorr.setAxisMinimum(0);
+
+            EjeXDC.setAxisMaximum( (float) tiempo);
+            EjeXDC.setAxisMinimum(0);
+        }
 
 
 
@@ -126,13 +249,9 @@ public class ReciboDatos extends  Thread{
         SetDC = new LineDataSet(ActualizaDatosGrafica(1,tiempo,I,D,vel),"Duty Cycle"); //Actualizamos el set Velocidad
         SetVel = new LineDataSet(ActualizaDatosGrafica(2,tiempo,I,D,vel),"Velocidad"); //Actualizamos el set Velocidad
 
-        SetCorr.setColors(Color.RED);
-        SetDC.setColors(Color.BLUE);
-        SetVel.setColors(Color.GREEN);
 
-        SetCorr.setCircleColors(Color.RED);
-        SetDC.setCircleColors(Color.BLUE);
-        SetVel.setCircleColors(Color.GREEN);
+        Puntos(mostrarPuntos);
+        FormatoEjes(ejeFijo);
 
         setsDatosGraficaVel = new ArrayList<>();
         setsDatosGraficaCorr =  new ArrayList<>();
@@ -148,9 +267,11 @@ public class ReciboDatos extends  Thread{
         DatosGrafCorr = new LineData(setsDatosGraficaCorr);
         DatosGrafDC = new LineData(setsDatosGraficaDC);
 
+
         graficaVel.setData(DatosGrafVel);
         //graficaVel.animateX(1000);
         graficaVel.invalidate();
+
 
         graficaCorr.setData(DatosGrafCorr);
         //graficaCorr.animateX(1000);
@@ -203,8 +324,15 @@ public class ReciboDatos extends  Thread{
     public void run(){
 
         while(true) {
-
             while (!pausa) {
+
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+
+                    e.printStackTrace();
+                }
+
                 ActualizaGrafica();
                 char caracter = '?';
                 char identificador = '?';
@@ -286,8 +414,16 @@ public class ReciboDatos extends  Thread{
 
                         case 'T':
 
+                            if(primerDato){
+                                tiempoInicial = Double.parseDouble(cadenaRecibida);
+                                tiempoInicial = tiempoInicial/1000;
+                                primerDato=false;
+                            }
+
+
                             tiempo = Double.parseDouble(cadenaRecibida);
-                            tiempo = tiempo / 1000000;//Pasar a segundos
+                            tiempo = tiempo / 1000;//Pasar a segundos
+                            tiempo-=tiempoInicial;
                             break;
 
                     }
@@ -299,6 +435,10 @@ public class ReciboDatos extends  Thread{
 
 
             }
+
+
+
+
         }
 
     }
