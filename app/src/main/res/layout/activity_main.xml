@@ -16,6 +16,19 @@
         app:layout_constraintStart_toStartOf="@+id/guideline7"
         app:layout_constraintTop_toTopOf="@+id/guideline9" />
 
+    <SeekBar
+        android:id="@+id/sbConsigna"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:max="3000"
+        android:min="-3000"
+        android:progress="0"
+        android:progressTint="#00FFFFFF"
+        app:layout_constraintBottom_toTopOf="@+id/guideline11"
+        app:layout_constraintEnd_toStartOf="@+id/guideline8"
+        app:layout_constraintStart_toStartOf="@+id/guideline7"
+        app:layout_constraintTop_toTopOf="@+id/sbBarraDeslizante" />
+
     <TextView
         android:id="@+id/ColorTabla"
         android:layout_width="0dp"

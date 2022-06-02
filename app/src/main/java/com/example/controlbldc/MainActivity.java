@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
     protected int REQUEST_ENABLE_BT = 1;
     protected float resolucion = 1;
+    protected float resolucionConsigna =1;
 
     protected double dutyCycle;
 
@@ -61,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
     protected CheckBox chPuntos,chEjefijo;
     public TextView tvVelocidad,tvVelocidadMax,tvVelocidadMin,tvDutyCycle,tvDutyCycleMax,tvDutyCycleMin,tvIntensidad,tvIntensidadMax,tvIntensidadMin;
     protected EditText etValorEnvio;
-    protected SeekBar sbBarraDeslizante;
+    protected SeekBar sbBarraDeslizante,sbConsigna;
     protected Spinner spDispositivos;
     protected ImageView ivConectar,ivEncender,ivRestart;
     protected Switch swIman;
@@ -248,6 +249,8 @@ public class MainActivity extends AppCompatActivity {
         tvIntensidadMin = findViewById(R.id.tvCorrienterMin);
 
         sbBarraDeslizante = findViewById(R.id.sbBarraDeslizante);
+        sbConsigna = findViewById(R.id.sbConsigna);
+
         etValorEnvio = findViewById(R.id.etValorEnvio);
         btEnvioValor = findViewById(R.id.btEnvioValor);
         spDispositivos = findViewById(R.id.spDispositivos);
@@ -495,6 +498,7 @@ public class MainActivity extends AppCompatActivity {
 
                             valorEdittext=true;
                             sbBarraDeslizante.setProgress((int)(Math.round(dutyCycle*resolucion)));
+                            sbConsigna.setProgress((int)(Math.round(dutyCycle*resolucionConsigna)));
 
                             String textoEnvio;
                             int caracter;
@@ -521,7 +525,8 @@ public class MainActivity extends AppCompatActivity {
 
                     if (dutyCycle >= -3000 && dutyCycle <= 3000) {
 
-                        sbBarraDeslizante.setProgress((int) (dutyCycle * resolucion));
+                        sbBarraDeslizante.setProgress((int) (Math.round(dutyCycle * resolucion)));
+                        sbConsigna.setProgress((int)(Math.round(dutyCycle*resolucionConsigna)));
                     }
                     MensajesPantalla(0);
                 }
