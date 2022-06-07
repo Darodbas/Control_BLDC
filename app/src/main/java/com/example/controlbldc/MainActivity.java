@@ -51,14 +51,14 @@ public class MainActivity extends AppCompatActivity {
     protected float resolucion = 1;
     protected float resolucionConsigna =1;
 
-    protected double dutyCycle;
+    protected double VelConsig;
 
     //Vectores para los dispositivos: nombres,direcciones y objetos BluetoothDevice//
     protected String[] nombresDisp;
     protected String[] direccionesDisp;
     protected BluetoothDevice[] dispositivos;
 
-    protected Button  btEnvioValor;
+    protected Button  btEnvio;
     protected CheckBox chPuntos,chEjefijo;
     public TextView tvVelocidad,tvVelocidadMax,tvVelocidadMin,tvDutyCycle,tvDutyCycleMax,tvDutyCycleMin,tvIntensidad,tvIntensidadMax,tvIntensidadMin;
     protected EditText etValorEnvio;
@@ -69,7 +69,6 @@ public class MainActivity extends AppCompatActivity {
 
     protected boolean conectado=false;
     protected boolean btActiv = false;
-    protected boolean valorEdittext=false;
     protected boolean encendido = false;
 
     protected UUID mUUID = fromString("00001101-0000-1000-8000-00805F9B34FB");
@@ -252,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
         sbConsigna = findViewById(R.id.sbConsigna);
 
         etValorEnvio = findViewById(R.id.etValorEnvio);
-        btEnvioValor = findViewById(R.id.btEnvioValor);
+        btEnvio = findViewById(R.id.btEnvioValor);
         spDispositivos = findViewById(R.id.spDispositivos);
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -485,28 +484,33 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        btEnvioValor.setOnClickListener(new View.OnClickListener() {
+        btEnvio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 if (conectado) {
+
                     if (etValorEnvio.getText().length() > 0) {
 
-                        dutyCycle = Double.parseDouble(String.valueOf(etValorEnvio.getText()));
+                        //Lee el valor en el EditText
+                        VelConsig = Double.parseDouble(String.valueOf(etValorEnvio.getText()));
 
-                        if (dutyCycle >= -3000 && dutyCycle <= 3000) {
+                        //se comprueba que no excede los límites
+                        if (VelConsig >= -3000 && VelConsig <= 3000) {
 
-                            valorEdittext=true;
-                            sbBarraDeslizante.setProgress((int)(Math.round(dutyCycle*resolucion)));
-                            sbConsigna.setProgress((int)(Math.round(dutyCycle*resolucionConsigna)));
+                            //Se actualiza la barra deslizante
+                            sbBarraDeslizante.setProgress((int)(Math.round(VelConsig*resolucion)));
+                            sbConsigna.setProgress((int)(Math.round(VelConsig*resolucionConsigna)));
 
                             String textoEnvio;
                             int caracter;
+                            //Se crea la cadena a enviar
                             textoEnvio = "V"+ etValorEnvio.getText()+"f";
 
 
                             try {
 
+                                //se envia la cadena
                                 for (caracter = 0; caracter < textoEnvio.length(); caracter++) {
                                     salidas.write(textoEnvio.charAt(caracter));
                                 }
@@ -520,13 +524,13 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }else{
-                    valorEdittext=true;
-                    dutyCycle = Double.parseDouble(String.valueOf(etValorEnvio.getText()));
 
-                    if (dutyCycle >= -3000 && dutyCycle <= 3000) {
+                    VelConsig = Double.parseDouble(String.valueOf(etValorEnvio.getText()));
 
-                        sbBarraDeslizante.setProgress((int) (Math.round(dutyCycle * resolucion)));
-                        sbConsigna.setProgress((int)(Math.round(dutyCycle*resolucionConsigna)));
+                    if (VelConsig >= -3000 && VelConsig <= 3000) {
+
+                        sbBarraDeslizante.setProgress((int) (Math.round(VelConsig * resolucion)));
+                        sbConsigna.setProgress((int)(Math.round(VelConsig*resolucionConsigna)));
                     }
                     MensajesPantalla(0);
                 }
@@ -537,23 +541,23 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
 
-                if(valorEdittext==false){//si el valor lo cambia el edit text no hace nada
-                    dutyCycle = (double) i/resolucion;
-                    dutyCycle = (int) Math.round(dutyCycle);
-                    etValorEnvio.setText(Integer.toString((int)dutyCycle));
-                }
+
+                    VelConsig = (double) i/resolucion;
+                    VelConsig = (int) Math.round(VelConsig);
+                    etValorEnvio.setText(Integer.toString((int)VelConsig));
+
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                valorEdittext=false;
+
 
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
 
-                etValorEnvio.setText(Integer.toString((int)dutyCycle));
+                etValorEnvio.setText(Integer.toString((int)VelConsig));
 
             }
         });
