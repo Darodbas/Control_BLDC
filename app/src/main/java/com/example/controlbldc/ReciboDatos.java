@@ -245,9 +245,9 @@ public class ReciboDatos extends  Thread{
 
     public  void ActualizaGrafica(){
 
-        SetCorr = new LineDataSet(ActualizaDatosGrafica(0,tiempo,I,D,vel),"Corriente"); //Actualizamos el set corriente
+        SetCorr = new LineDataSet(ActualizaDatosGrafica(0,tiempo,I,D,vel),"Corriente (A)"); //Actualizamos el set corriente
         SetDC = new LineDataSet(ActualizaDatosGrafica(1,tiempo,I,D,vel),"Duty Cycle"); //Actualizamos el set Velocidad
-        SetVel = new LineDataSet(ActualizaDatosGrafica(2,tiempo,I,D,vel),"Velocidad"); //Actualizamos el set Velocidad
+        SetVel = new LineDataSet(ActualizaDatosGrafica(2,tiempo,I,D,vel),"Velocidad (rpm)"); //Actualizamos el set Velocidad
 
 
         Puntos(mostrarPuntos);
@@ -322,38 +322,34 @@ public class ReciboDatos extends  Thread{
     }
 
     public void run(){
-
         while(true) {
-            while (!pausa) {
 
+            while (!pausa) {
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
-
                     e.printStackTrace();
                 }
 
                 ActualizaGrafica();
-                char caracter = '?';
-                char identificador = '?';
+                char caracter = '#';
+                char identificador = '#';
                 String cadenaRecibida = "";
 
-
                 try {
-
                     entradas.skip(entradas.available());
-
-                    while (caracter != 'V' && caracter != 'I' && caracter != 'D' && caracter != 'T') {//Lee caracteres hasta llegar a una V, I o D//
+                    //Lee caracteres hasta llegar a una V, I o D//
+                    while (caracter != 'V' && caracter != 'I' && caracter != 'D' && caracter != 'T') {
                         caracter = (char) entradas.read();
                     }
                     identificador = caracter; //guardamos el caracter con el que ha llegado//
 
-                    while (caracter != 'f') { //leemos hasta encontrar una f y lo guardamos en una cadena//
+                    //leem hasta encontrar una f y se guarda en una cadena//
+                    while (caracter != 'f') {
                         caracter = (char) entradas.read();
                         if (caracter != 'f') {
                             cadenaRecibida = cadenaRecibida + caracter;
                         }
-
                     }
 
                     switch (identificador) {
@@ -432,14 +428,7 @@ public class ReciboDatos extends  Thread{
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
-
             }
-
-
-
-
         }
-
     }
 }
